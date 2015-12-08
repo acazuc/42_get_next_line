@@ -3,52 +3,25 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: acazuc <marvin@42.fr>                      +#+  +:+       +#+        */
+/*   By: acazuc <acazuc@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2015/11/25 16:22:35 by acazuc            #+#    #+#             */
-/*   Updated: 2015/11/29 16:43:37 by acazuc           ###   ########.fr       */
+/*   Created: 2015/12/07 08:51:03 by acazuc            #+#    #+#             */
+/*   Updated: 2015/12/08 08:30:09 by acazuc           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
 #include <stdlib.h>
-#include "libft/libft.h"
 #include <string.h>
 #include <unistd.h>
+#include "libft/libft.h"
+#include "get_next_line.h"
 
-static int		ft_list_add(t_list **list, char *data, size_t len)
+static int	get_eol(char *data)
 {
-	t_list		*item;
-
-	if (*list)
-	{
-		item = *list;
-		while (item->next)
-			item = item->next;
-		if (!(item->next = malloc(sizeof(t_list))))
-			return (0);
-		item->next->content = data;
-		item->next->content_size = len;
-		item->next->next = NULL;
-	}
-	else
-	{
-		if (!(item = malloc(sizeof(t_list))))
-			return (0);
-		item->content = data;
-		item->content_size = len;
-		item->next = NULL;
-		*list = item;
-	}
-	return (1);
-}
-
-static long		get_eol(char *data)
-{
-	size_t		i;
+	size_t			i;
 
 	i = 0;
-	while (i < BUFFER_SIZE && data[i])
+	while (data[i])
 	{
 		if (data[i] == '\n')
 			return (i);
@@ -57,89 +30,76 @@ static long		get_eol(char *data)
 	return (-1);
 }
 
-static int		ft_do_final(char **line, t_list *list)
+static int	get_next_line_main_part(t_env *e, char *buffer, long eol_i
+		, int readed)
 {
-	t_list		*item;
-	t_list		*next;
-	long		eol_i;
-	size_t		i;
-
-	item = list;
-	i = 1;
-	while (item)
+	if (eol_i != -1)
 	{
-		eol_i = get_eol(item->content);
-		i += eol_i == -1 ? item->content_size : eol_i;
-		item = item->next;
+		if (!(*(e->line) = ft_strjoin(*(e->line), ft_strsub(buffer, 0, eol_i))))
+			return (-1);
+		*(e->start) = ft_strsub(buffer, eol_i + 1, readed - 1 - eol_i);
+		free(buffer);
+		if (!(*(e->start)))
+			return (-1);
+		return (1);
 	}
-	if (!(*line = malloc(sizeof(**line) * i)))
-		return (0);
-	(*line)[0] = '\0';
-	item = list;
-	i = 0;
-	while (item)
-	{
-		eol_i = get_eol(item->content);
-		i = eol_i == -1 ? item->content_size : eol_i;
-		ft_strncat(*line, item->content, i);
-		free(item->content);
-		next = item->next;
-		free(item);
-		item = next;
-	}
+	if (!(*(e->line) = ft_strjoin(*(e->line), buffer)))
+		return (-1);
 	return (1);
 }
 
-static int		get_next_line_main(int const fd, char **line, t_list *list
-		, char **start)
+static int	get_next_line_main(t_env *e)
 {
-	long		eol_i;
-	int			readed;
-	char		*buffer;
+	long			eol_i;
+	int				readed;
+	char			*buffer;
+	int				has_readed;
 
-	if ((buffer = malloc(sizeof(*buffer) * BUFFER_SIZE)))
-		while ((readed = read(fd, buffer, BUFFER_SIZE)) != -1)
+	has_readed = 0;
+	if (!(buffer = malloc(sizeof(*buffer) * BUFFER_SIZE + 1)))
+		return (-1);
+	while ((readed = read(e->fd, buffer, BUFFER_SIZE)) != -1)
+	{
+		if (readed == 0 && !has_readed)
+			return (0);
+		has_readed = 1;
+		buffer[readed] = '\0';
+		if ((eol_i = get_eol(buffer)) != -1 || readed < BUFFER_SIZE)
 		{
-			if (!readed)
-				return (0);
-			if (!ft_list_add(&list, buffer, readed))
-				return (-1);
-			if (readed < BUFFER_SIZE || (eol_i = get_eol(buffer)) != -1)
-			{
-				if (readed < BUFFER_SIZE)
-					buffer[readed] = '\0';
-				eol_i = get_eol(buffer);
-				*start = ft_strsub(buffer, eol_i + 1, readed - 1 - eol_i);
-				if (!ft_do_final(line, list))
-					return (-1);
-				return ((*start && ft_strlen(*start) > 0) || readed);
-			}
-			if (!(buffer = malloc(sizeof(*buffer) * BUFFER_SIZE)))
-				return (-1);
+			return (get_next_line_main_part(e, buffer, eol_i, readed));
 		}
+		if (!(*(e->line) = ft_strjoin(*(e->line), buffer)))
+			return (-1);
+	}
+	free(buffer);
 	return (-1);
 }
 
-int				get_next_line(int const fd, char **line)
+int			get_next_line(const int fd, char **line)
 {
-	static char	*start;
-	t_list		*list;
-	long		eol_i;
+	static char		*start;
+	t_env			e;
+	long			eol_i;
 
-	list = NULL;
 	if (!line)
 		return (-1);
-	*line = NULL;
+	if (!(*line = malloc(sizeof(**line))))
+		return (-1);
+	*line[0] = '\0';
 	if (start && ft_strlen(start) > 0)
 	{
 		if ((eol_i = get_eol(start)) != -1)
 		{
 			*line = ft_strsub(start, 0, eol_i);
-			start = ft_strsub(start, eol_i + 1, ft_strlen(start) - 1);
+			start = ft_strsub(start, eol_i + 1, ft_strlen(start) - 1 - eol_i);
 			return (1);
 		}
-		else if (!ft_list_add(&list, ft_strdup(start), ft_strlen(start)))
-			return (-1);
+		*line = ft_strdup(start);
+		free(start);
+		start = NULL;
 	}
-	return (get_next_line_main(fd, line, list, &start));
+	e.line = line;
+	e.start = &start;
+	e.fd = fd;
+	return (get_next_line_main(&e));
 }
