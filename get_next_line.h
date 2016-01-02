@@ -6,14 +6,14 @@
 /*   By: acazuc <acazuc@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/12/07 09:06:54 by acazuc            #+#    #+#             */
-/*   Updated: 2015/12/08 08:29:19 by acazuc           ###   ########.fr       */
+/*   Updated: 2016/01/02 13:28:39 by acazuc           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef FT_GET_NEXT_LINE_H
-# define FT_GET_NEXT_LINE_H
+#ifndef GET_NEXT_LINE_H
+# define GET_NEXT_LINE_H
 
-# define BUFFER_SIZE 1000
+# define BUFFER_SIZE 1
 
 int					get_next_line(const int fd, char **line);
 
