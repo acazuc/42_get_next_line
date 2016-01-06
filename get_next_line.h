@@ -6,7 +6,7 @@
 /*   By: acazuc <acazuc@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/12/07 09:06:54 by acazuc            #+#    #+#             */
-/*   Updated: 2016/01/02 13:28:39 by acazuc           ###   ########.fr       */
+/*   Updated: 2016/01/06 13:14:14 by acazuc           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,11 @@
 # define GET_NEXT_LINE_H
 
 # define BUFFER_SIZE 1
+
+# include <stdlib.h>
+# include <string.h>
+# include <unistd.h>
+# include "libft.h"
 
 int					get_next_line(const int fd, char **line);
 

@@ -6,14 +6,10 @@
 /*   By: acazuc <acazuc@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/12/07 08:51:03 by acazuc            #+#    #+#             */
-/*   Updated: 2015/12/08 09:18:48 by acazuc           ###   ########.fr       */
+/*   Updated: 2016/01/06 13:14:01 by acazuc           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include "libft/libft.h"
 #include "get_next_line.h"
 
 static int	get_eol(char *data)
@@ -35,7 +31,8 @@ static int	get_next_line_main_part(t_env *e, char *buffer, long eol_i
 {
 	if (eol_i != -1)
 	{
-		if (!(*(e->line) = ft_strjoin(*(e->line), ft_strsub(buffer, 0, eol_i))))
+		if (!(*(e->line) = ft_strjoin_free3(*(e->line)
+						, ft_strsub(buffer, 0, eol_i))))
 			return (-1);
 		*(e->start) = ft_strsub(buffer, eol_i + 1, readed - 1 - eol_i);
 		free(buffer);
@@ -68,7 +65,7 @@ static int	get_next_line_main(t_env *e)
 		{
 			return (get_next_line_main_part(e, buffer, eol_i, readed));
 		}
-		if (!(*(e->line) = ft_strjoin(*(e->line), buffer)))
+		if (!(*(e->line) = ft_strjoin_free1(*(e->line), buffer)))
 			return (-1);
 	}
 	free(buffer);
