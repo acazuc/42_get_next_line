@@ -6,7 +6,7 @@
 /*   By: acazuc <acazuc@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/12/07 08:51:03 by acazuc            #+#    #+#             */
-/*   Updated: 2016/01/06 13:14:01 by acazuc           ###   ########.fr       */
+/*   Updated: 2016/01/14 16:36:48 by acazuc           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,29 +74,28 @@ static int	get_next_line_main(t_env *e)
 
 int			get_next_line(const int fd, char **line)
 {
-	static char		*start;
+	static char		*start[256];
 	t_env			e;
 	long			eol_i;
 
-	if (!line)
-		return (-1);
-	if (!(*line = malloc(sizeof(**line))))
+	if (!line || fd < 0 || fd > 255 || !(*line = malloc(sizeof(**line))))
 		return (-1);
 	*line[0] = '\0';
-	if (start && ft_strlen(start) > 0)
+	if (start[fd] && ft_strlen(start[fd]) > 0)
 	{
-		if ((eol_i = get_eol(start)) != -1)
+		if ((eol_i = get_eol(start[fd])) != -1)
 		{
-			*line = ft_strsub(start, 0, eol_i);
-			start = ft_strsub(start, eol_i + 1, ft_strlen(start) - 1 - eol_i);
+			*line = ft_strsub(start[fd], 0, eol_i);
+			start[fd] = ft_strsub(start[fd], eol_i + 1
+					, ft_strlen(start[fd]) - 1 - eol_i);
 			return (1);
 		}
-		*line = ft_strdup(start);
-		free(start);
-		start = NULL;
+		*line = ft_strdup(start[fd]);
+		free(start[fd]);
+		start[fd] = NULL;
 	}
 	e.line = line;
-	e.start = &start;
+	e.start = &(start[fd]);
 	e.fd = fd;
 	return (get_next_line_main(&e));
 }
