@@ -6,7 +6,7 @@
 /*   By: acazuc <acazuc@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/12/07 08:51:03 by acazuc            #+#    #+#             */
-/*   Updated: 2016/01/14 16:36:48 by acazuc           ###   ########.fr       */
+/*   Updated: 2016/01/17 12:48:52 by acazuc           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,8 @@ int			get_next_line(const int fd, char **line)
 	t_env			e;
 	long			eol_i;
 
-	if (!line || fd < 0 || fd > 255 || !(*line = malloc(sizeof(**line))))
+	if (BUFFER_SIZE <= 0 || !line || fd < 0 || fd > 255
+		|| !(*line = malloc(sizeof(**line))))
 		return (-1);
 	*line[0] = '\0';
 	if (start[fd] && ft_strlen(start[fd]) > 0)
