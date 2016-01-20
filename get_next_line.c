@@ -6,7 +6,7 @@
 /*   By: acazuc <acazuc@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/12/07 08:51:03 by acazuc            #+#    #+#             */
-/*   Updated: 2016/01/18 07:59:50 by acazuc           ###   ########.fr       */
+/*   Updated: 2016/01/20 14:33:51 by acazuc           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ static int	get_eol(char *data)
 	return (-1);
 }
 
-static int	get_next_line_main_part(t_env *e, char *buffer, long eol_i
+static int	get_next_line_main_part(t_gnl *e, char *buffer, long eol_i
 		, int readed)
 {
 	if (eol_i != -1)
@@ -40,12 +40,12 @@ static int	get_next_line_main_part(t_env *e, char *buffer, long eol_i
 			return (-1);
 		return (1);
 	}
-	if (!(*(e->line) = ft_strjoin(*(e->line), buffer)))
+	if (!(*(e->line) = ft_strjoin_free1(*(e->line), buffer)))
 		return (-1);
 	return (1);
 }
 
-static int	get_next_line_main(t_env *e)
+static int	get_next_line_main(t_gnl *e)
 {
 	long			eol_i;
 	int				readed;
@@ -53,15 +53,15 @@ static int	get_next_line_main(t_env *e)
 	int				has_readed;
 
 	has_readed = 0;
-	if (!(buffer = malloc(sizeof(*buffer) * BUFFER_SIZE + 1)))
+	if (!(buffer = malloc(sizeof(*buffer) * BUFF_SIZE + 1)))
 		return (-1);
-	while ((readed = read(e->fd, buffer, BUFFER_SIZE)) != -1)
+	while ((readed = read(e->fd, buffer, BUFF_SIZE)) != -1)
 	{
 		if (readed == 0 && !has_readed)
 			return (0);
 		has_readed = 1;
 		buffer[readed] = '\0';
-		if ((eol_i = get_eol(buffer)) != -1 || readed < BUFFER_SIZE)
+		if ((eol_i = get_eol(buffer)) != -1 || readed < BUFF_SIZE)
 		{
 			return (get_next_line_main_part(e, buffer, eol_i, readed));
 		}
@@ -75,7 +75,7 @@ static int	get_next_line_main(t_env *e)
 int			get_next_line(const int fd, char **line)
 {
 	static char		*start[256];
-	t_env			e;
+	t_gnl			e;
 	long			eol_i;
 
 	if (!line || fd < 0 || fd > 255 || !(*line = malloc(sizeof(**line))))

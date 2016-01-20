@@ -1,33 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.h                                    :+:      :+:    :+:   */
+/*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: acazuc <acazuc@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2015/12/07 09:06:54 by acazuc            #+#    #+#             */
-/*   Updated: 2016/01/20 14:30:21 by acazuc           ###   ########.fr       */
+/*   Created: 2016/01/19 09:09:52 by acazuc            #+#    #+#             */
+/*   Updated: 2016/01/19 09:16:07 by acazuc           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef GET_NEXT_LINE_H
-# define GET_NEXT_LINE_H
+#include <fcntl.h>
+#include "get_next_line.h"
 
-# define BUFF_SIZE 8
-
-# include <stdlib.h>
-# include <string.h>
-# include <unistd.h>
-# include "libft.h"
-
-int					get_next_line(const int fd, char **line);
-
-typedef struct		s_gnl
+int main(int ac, char **av)
 {
-	char			**line;
-	char			**start;
-	char			**buffer;
-	int				fd;
-}					t_gnl;
+	int fd;
 
-#endif
+	if (ac != 2)
+		exit(-1);
+	if ((fd = open(av[1], O_RDONLY)) == -1)
+		exit(-1);
+	char *line;
+	while (get_next_line(fd, &line) == 1)
+	{
+		ft_putendl(line);
+	}
+	return (0);
+}
