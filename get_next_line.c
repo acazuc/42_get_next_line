@@ -6,7 +6,7 @@
 /*   By: acazuc <acazuc@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/12/07 08:51:03 by acazuc            #+#    #+#             */
-/*   Updated: 2016/01/20 14:33:51 by acazuc           ###   ########.fr       */
+/*   Updated: 2016/01/21 12:58:50 by acazuc           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ static int	get_next_line_main_part(t_gnl *e, char *buffer, long eol_i
 			return (-1);
 		return (1);
 	}
-	if (!(*(e->line) = ft_strjoin_free1(*(e->line), buffer)))
+	if (!(*(e->line) = ft_strjoin_free3(*(e->line), buffer)))
 		return (-1);
 	return (1);
 }
